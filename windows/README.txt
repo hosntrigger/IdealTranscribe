@@ -1,4 +1,4 @@
-LOCAL TRANSCRIBER – UNIVERSAL WINDOWS V2.3
+IDEAL TRANSCRIBE – UNIVERSAL WINDOWS V2.3
 
 Ziel:
 Eine Windows-Version für Laptop UND leistungsstarke Workstation.
