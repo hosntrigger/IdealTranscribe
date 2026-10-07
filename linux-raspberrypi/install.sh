@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="$HOME/.local/share/local-transcriber"
-DATA_DIR="$HOME/.local/share/LocalTranscriber"
+APP_DIR="$HOME/.local/share/ideal-transcribe"
+DATA_DIR="$HOME/.local/share/IdealTranscribe"
 BIN_DIR="$HOME/.local/bin"
 DESKTOP_DIR="$HOME/.local/share/applications"
 VENV_DIR="$APP_DIR/venv"
@@ -23,7 +23,7 @@ sudo apt install -y \
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/assets" "$DATA_DIR/models" "$BIN_DIR" "$DESKTOP_DIR"
 
-cp local_transcriber.py "$APP_DIR/local_transcriber.py"
+cp ideal_transcribe.py "$APP_DIR/ideal_transcribe.py"
 cp -r assets/* "$APP_DIR/assets/"
 
 # Bestehende whisper.cpp-Modelle ohne Kopieren wiederverwenden.
@@ -50,26 +50,26 @@ fi
 
 cat > "$APP_DIR/run.sh" <<EOF
 #!/usr/bin/env bash
-exec "$VENV_DIR/bin/python" "$APP_DIR/local_transcriber.py" "\$@"
+exec "$VENV_DIR/bin/python" "$APP_DIR/ideal_transcribe.py" "\$@"
 EOF
 chmod +x "$APP_DIR/run.sh"
 
-rm -f "$BIN_DIR/local-transcriber"
+rm -f "$BIN_DIR/ideal-transcribe"
 ln -sf "$APP_DIR/run.sh" "$BIN_DIR/ideal-transcribe"
 
-rm -f "$DESKTOP_DIR/local-transcriber.desktop"
+rm -f "$DESKTOP_DIR/ideal-transcribe.desktop"
 cat > "$DESKTOP_DIR/ideal-transcribe.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Ideal Transcribe
 Comment=Lokale Audio- und Video-Transkription
 Exec=$APP_DIR/run.sh
-Icon=$APP_DIR/assets/localtranscriber_icon_256.png
+Icon=$APP_DIR/assets/idealtranscribe_icon_256.png
 Terminal=false
 Categories=AudioVideo;Audio;Video;
 StartupNotify=true
 EOF
-chmod +x "$DESKTOP_DIR/local-transcriber.desktop"
+chmod +x "$DESKTOP_DIR/ideal-transcribe.desktop"
 
 echo
 echo "Installation abgeschlossen."
