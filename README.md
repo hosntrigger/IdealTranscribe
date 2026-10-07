@@ -38,6 +38,12 @@ windows/BUILD_WINDOWS_EXE.bat
 
 The finished executable is created at `windows/dist/LocalTranscriber.exe`. A release should normally attach the tested EXE or a ZIP containing it to GitHub Releases instead of committing binaries to the source tree.
 
+### Windows SmartScreen notice
+
+The current Windows build is **not digitally signed**. Microsoft Defender SmartScreen may therefore show a warning such as **"Windows protected your PC"** when the application is started for the first time.
+
+This warning can occur because the executable is new and has no established SmartScreen reputation; it is not, by itself, a malware detection. If you downloaded Local Transcriber from the official GitHub release page, use **More info → Run anyway** if you want to start it.
+
 ## Raspberry Pi
 
 The Raspberry Pi package is under `linux-raspberrypi/` and uses the same Tkinter UI/codebase as Windows, adapted for ARM/CPU.
