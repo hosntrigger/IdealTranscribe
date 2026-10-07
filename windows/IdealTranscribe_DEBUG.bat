@@ -1,6 +1,6 @@
 @echo off
 cd /d "%~dp0"
-python local_transcriber.py
+python ideal_transcribe.py
 echo.
 echo ============================================
 echo Ideal Transcribe wurde beendet.
