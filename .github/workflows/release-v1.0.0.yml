@@ -1,0 +1,108 @@
+name: Package and Publish Ideal Transcribe 1.0.0
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate Windows source
+        working-directory: windows
+        run: python -m py_compile ideal_transcribe.py
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller tkinterdnd2
+
+      - name: Build EXE
+        working-directory: windows
+        run: |
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name IdealTranscribe --icon "assets\idealtranscribe_icon.ico" --add-data "assets;assets" --collect-all tkinterdnd2 ideal_transcribe.py
+
+      - name: Create Windows release package
+        shell: pwsh
+        run: |
+          $pkg = "IdealTranscribe_1.0.0_Windows_FINAL"
+          New-Item -ItemType Directory -Force -Path $pkg | Out-Null
+          Copy-Item "windows/dist/IdealTranscribe.exe" "$pkg/IdealTranscribe.exe"
+          Copy-Item "LICENSE" "$pkg/LICENSE"
+          Copy-Item "THIRD_PARTY_NOTICES.md" "$pkg/THIRD_PARTY_NOTICES.md"
+          Copy-Item "CHANGELOG.md" "$pkg/CHANGELOG.md"
+          Copy-Item "COMMERCIAL_LICENSE.md" "$pkg/COMMERCIAL_LICENSE.md"
+          Copy-Item "SUPPORT.md" "$pkg/SUPPORT.md"
+          Copy-Item "README.md" "$pkg/README.md"
+          Copy-Item "windows/README.txt" "$pkg/README_WINDOWS.txt"
+          $hash = (Get-FileHash "$pkg/IdealTranscribe.exe" -Algorithm SHA256).Hash.ToLower()
+          "$hash  IdealTranscribe.exe" | Set-Content "$pkg/SHA256SUMS.txt"
+          Compress-Archive -Path "$pkg/*" -DestinationPath "$pkg.zip" -Force
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IdealTranscribe-1.0.0-Windows-FINAL
+          path: IdealTranscribe_1.0.0_Windows_FINAL.zip
+          if-no-files-found: error
+
+  raspberry-pi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Raspberry Pi source and scripts
+        run: |
+          python3 -m py_compile linux-raspberrypi/ideal_transcribe.py
+          bash -n linux-raspberrypi/install.sh
+          bash -n linux-raspberrypi/UNINSTALL_IDEAL_TRANSCRIBE.sh
+
+      - name: Create Raspberry Pi release package
+        run: |
+          pkg="IdealTranscribe_1.0.0_RaspberryPi_FINAL"
+          mkdir -p "$pkg/assets"
+          cp linux-raspberrypi/ideal_transcribe.py "$pkg/"
+          cp linux-raspberrypi/install.sh "$pkg/"
+          cp linux-raspberrypi/UNINSTALL_IDEAL_TRANSCRIBE.sh "$pkg/"
+          cp linux-raspberrypi/README_RASPBERRY_PI.txt "$pkg/"
+          cp linux-raspberrypi/assets/* "$pkg/assets/"
+          cp LICENSE "$pkg/"
+          cp THIRD_PARTY_NOTICES.md "$pkg/"
+          cp COMMERCIAL_LICENSE.md "$pkg/"
+          cp SUPPORT.md "$pkg/"
+          (cd "$pkg" && sha256sum ideal_transcribe.py > SHA256SUMS.txt)
+          zip -r "${pkg}.zip" "$pkg"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IdealTranscribe-1.0.0-RaspberryPi-FINAL
+          path: IdealTranscribe_1.0.0_RaspberryPi_FINAL.zip
+          if-no-files-found: error
+
+  publish:
+    needs: [windows, raspberry-pi]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: IdealTranscribe-1.0.0-*-FINAL
+          merge-multiple: true
+          path: release-assets
+
+      - name: Replace v1.0.0 release with clean Ideal Transcribe release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete v1.0.0 --cleanup-tag --yes || true
+          gh release create v1.0.0             release-assets/IdealTranscribe_1.0.0_Windows_FINAL.zip             release-assets/IdealTranscribe_1.0.0_RaspberryPi_FINAL.zip             --target "$GITHUB_SHA"             --title "Ideal Transcribe 1.0.0"             --notes-file RELEASE_NOTES_1.0.0.md
