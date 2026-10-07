@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="$HOME/.local/share/ideal-transcribe"
-BIN_LINK="$HOME/.local/bin/ideal-transcribe"
-LEGACY_BIN_LINK="$HOME/.local/bin/ideal-transcribe"
-DESKTOP_FILE="$HOME/.local/share/applications/ideal-transcribe.desktop"
-LEGACY_DESKTOP_FILE="$HOME/.local/share/applications/ideal-transcribe.desktop"
+echo "Deinstalliere Ideal Transcribe und entferne alte Programmreste ..."
 
-echo "Deinstalliere die aktuell installierte Local-Transcriber-GUI ..."
-rm -rf "$APP_DIR"
-rm -f "$BIN_LINK" "$LEGACY_BIN_LINK"
-rm -f "$DESKTOP_FILE" "$LEGACY_DESKTOP_FILE"
+rm -rf "$HOME/.local/share/ideal-transcribe"
+rm -rf "$HOME/.local/share/IdealTranscribe"
+rm -rf "$HOME/.local/share/local-transcriber"
+rm -rf "$HOME/.local/share/LocalTranscriber"
+
+rm -f "$HOME/.local/bin/ideal-transcribe"
+rm -f "$HOME/.local/bin/local-transcriber"
+
+rm -f "$HOME/.local/share/applications/ideal-transcribe.desktop"
+rm -f "$HOME/.local/share/applications/local-transcriber.desktop"
+
+update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 
 echo
-echo "Fertig."
-echo "Nicht gelöscht wurden:"
+echo "Fertig. Ideal Transcribe und alte GUI-Reste wurden entfernt."
+echo "Unverändert bleiben:"
 echo "  ~/whisper.cpp"
 echo "  ~/whisper.cpp/models"
-echo "  ~/.local/share/IdealTranscribe"
