@@ -1,6 +1,6 @@
-# Local Transcriber
+# Ideal Transcribe
 
-**Local Transcriber by IDEALVISUAL** is a desktop GUI for local audio/video transcription with `whisper.cpp`. It is free for permitted noncommercial use; commercial use requires a separate license.
+**Ideal Transcribe by IDEALVISUAL** is a desktop GUI for local audio/video transcription with `whisper.cpp`. It is free for permitted noncommercial use; commercial use requires a separate license.
 
 ## Version
 
@@ -42,7 +42,7 @@ The finished executable is created at `windows/dist/LocalTranscriber.exe`. A rel
 
 The current Windows build is **not digitally signed**. Microsoft Defender SmartScreen may therefore show a warning such as **"Windows protected your PC"** when the application is started for the first time.
 
-This warning can occur because the executable is new and has no established SmartScreen reputation; it is not, by itself, a malware detection. If you downloaded Local Transcriber from the official GitHub release page, use **More info → Run anyway** if you want to start it.
+This warning can occur because the executable is new and has no established SmartScreen reputation; it is not, by itself, a malware detection. If you downloaded Ideal Transcribe from the official GitHub release page, use **More info → Run anyway** if you want to start it.
 
 ## Raspberry Pi
 
@@ -63,13 +63,13 @@ Transcription is performed locally. Audio and video files do not need to be uplo
 
 ## Project support
 
-Local Transcriber is free for permitted noncommercial use. Voluntary support for further development:
+Ideal Transcribe is free for permitted noncommercial use. Voluntary support for further development:
 
 https://paypal.me/gottschn
 
 ## License
 
-Local Transcriber source code and official builds are provided under the **PolyForm Noncommercial License 1.0.0**. See `LICENSE`.
+Ideal Transcribe source code and official builds are provided under the **PolyForm Noncommercial License 1.0.0**. See `LICENSE`.
 
 - permitted noncommercial use: free
 - commercial/business use: separate commercial license required
