@@ -36,7 +36,7 @@ Build locally with:
 windows/BUILD_WINDOWS_EXE.bat
 ```
 
-The finished executable is created at `windows/dist/LocalTranscriber.exe`. A release should normally attach the tested EXE or a ZIP containing it to GitHub Releases instead of committing binaries to the source tree.
+The finished executable is created at `windows/dist/IdealTranscribe.exe`. A release should normally attach the tested EXE or a ZIP containing it to GitHub Releases instead of committing binaries to the source tree.
 
 ### Windows SmartScreen notice
 
