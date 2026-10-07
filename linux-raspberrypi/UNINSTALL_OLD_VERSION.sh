@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="$HOME/.local/share/local-transcriber"
+APP_DIR="$HOME/.local/share/ideal-transcribe"
 BIN_LINK="$HOME/.local/bin/ideal-transcribe"
-LEGACY_BIN_LINK="$HOME/.local/bin/local-transcriber"
+LEGACY_BIN_LINK="$HOME/.local/bin/ideal-transcribe"
 DESKTOP_FILE="$HOME/.local/share/applications/ideal-transcribe.desktop"
-LEGACY_DESKTOP_FILE="$HOME/.local/share/applications/local-transcriber.desktop"
+LEGACY_DESKTOP_FILE="$HOME/.local/share/applications/ideal-transcribe.desktop"
 
 echo "Deinstalliere die aktuell installierte Local-Transcriber-GUI ..."
 rm -rf "$APP_DIR"
@@ -17,4 +17,4 @@ echo "Fertig."
 echo "Nicht gelöscht wurden:"
 echo "  ~/whisper.cpp"
 echo "  ~/whisper.cpp/models"
-echo "  ~/.local/share/LocalTranscriber"
+echo "  ~/.local/share/IdealTranscribe"
