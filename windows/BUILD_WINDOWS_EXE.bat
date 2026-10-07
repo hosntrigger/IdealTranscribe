@@ -14,10 +14,10 @@ if errorlevel 1 goto :fail
 
 python -m PyInstaller --noconfirm --clean --onefile --windowed ^
   --name "IdealTranscribe" ^
-  --icon "assets\localtranscriber_icon.ico" ^
+  --icon "assets\idealtranscribe_icon.ico" ^
   --add-data "assets;assets" ^
   --collect-all tkinterdnd2 ^
-  local_transcriber.py
+  ideal_transcribe.py
 if errorlevel 1 goto :fail
 
 echo.
