@@ -19,7 +19,11 @@ sudo apt install -y \
   python3 python3-tk python3-venv python3-pip \
   ffmpeg git cmake build-essential
 
-# Alte GUI ersetzen, Daten/Modelle behalten.
+# Alte Programmreste entfernen und neue Struktur anlegen.
+rm -rf "$HOME/.local/share/local-transcriber"
+rm -rf "$HOME/.local/share/LocalTranscriber"
+rm -f "$BIN_DIR/local-transcriber"
+rm -f "$DESKTOP_DIR/local-transcriber.desktop"
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/assets" "$DATA_DIR/models" "$BIN_DIR" "$DESKTOP_DIR"
 
