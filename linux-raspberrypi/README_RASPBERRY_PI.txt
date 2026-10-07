@@ -34,4 +34,4 @@ Neue Version installieren:
   ./install.sh
 
 Start:
-  local-transcriber
+  ideal-transcribe
