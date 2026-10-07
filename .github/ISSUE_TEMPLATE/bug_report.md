@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a reproducible Local Transcriber problem
+about: Report a reproducible Ideal Transcribe problem
 title: "[Bug] "
 labels: bug
 ---
@@ -8,7 +8,7 @@ labels: bug
 ## Platform
 Windows / Linux / Raspberry Pi:
 
-## Local Transcriber version
+## Ideal Transcribe version
 
 ## What happened?
 
