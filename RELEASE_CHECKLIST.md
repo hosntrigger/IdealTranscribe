@@ -1,4 +1,4 @@
-# Local Transcriber 1.0.0 release checklist
+# Ideal Transcribe 1.0.0 release checklist
 
 ## Already tested by the project owner
 - [x] Windows application starts and transcribes successfully
