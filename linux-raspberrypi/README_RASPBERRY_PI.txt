@@ -1,4 +1,4 @@
-Local Transcriber 1.0.0 – Raspberry Pi FINAL TEST
+Ideal Transcribe 1.0.0 – Raspberry Pi FINAL TEST
 
 Diese Version basiert direkt auf der aktuellen Windows-FINAL3-Tkinter-Anwendung.
 
