@@ -14,9 +14,9 @@ Neu gegenüber V1:
 - Modellverwaltung direkt in der GUI
 - Base / Small / Medium / Large V3 Turbo per Klick herunterladbar
 - Modelle liegen zentral unter:
-  %LOCALAPPDATA%\LocalTranscriber\models
+  %LOCALAPPDATA%\IdealTranscribe\models
 - Komponenten liegen unter:
-  %LOCALAPPDATA%\LocalTranscriber\bin
+  %LOCALAPPDATA%\IdealTranscribe\bin
 - gleiche Grundbedienung wie OfficePi-Version
 - Batch / TXT / SRT / VTT
 - gleicher Ordner / transkripte / benutzerdefiniert
@@ -27,7 +27,7 @@ Neu gegenüber V1:
 START:
 1. ZIP entpacken
 2. setup_windows.bat einmal ausführen
-3. LocalTranscriber.bat starten
+3. IdealTranscribe.bat starten
 4. Beim ersten Start "Alles automatisch einrichten" wählen
 5. Gewünschtes Modell über "Modell verwalten..." installieren
 
@@ -61,7 +61,7 @@ V2.3:
 V2.3.1 HOTFIX:
 - Syntaxfehler aus v2.3 behoben.
 - Python-Datei vor Veröffentlichung mit py_compile geprüft.
-- zusätzliche LocalTranscriber_DEBUG.bat beigelegt; deren Fenster bleibt bei Laufzeitfehlern offen.
+- zusätzliche IdealTranscribe_DEBUG.bat beigelegt; deren Fenster bleibt bei Laufzeitfehlern offen.
 
 V2.4.1:
 - Wiederholungsversuche bei GitHub/API-Downloads.
