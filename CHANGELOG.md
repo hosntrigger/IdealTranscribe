@@ -3,8 +3,10 @@
 ### Release licensing
 - public v1.0.0 license set to PolyForm Noncommercial 1.0.0; commercial use requires a separate license
 
+
 ### Release candidate fix
 - progress bar/status moved outside the resizable queue/live panes so it stays visible on small screens
+
 
 ## 1.0.0
 - first public release

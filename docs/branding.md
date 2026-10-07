@@ -1,5 +1,10 @@
-# Branding
+# Branding notes
 
-Local Transcriber is an IDEALVISUAL project.
+Local Transcriber uses a dark IDEALVISUAL-inspired UI language.
 
-The Local Transcriber name, application icon and IDEALVISUAL branding are project identifiers and are not intended to grant trademark rights through the software license.
+Design DNA:
+- anthracite base
+- cyan/light-blue accents
+- compact geometric symbol mark
+- Local Transcriber as product brand
+- IDEALVISUAL as umbrella brand

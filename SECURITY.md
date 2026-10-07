@@ -1,5 +1,5 @@
 # Security
 
-Please do not post sensitive audio, transcripts, personal file names, credentials or private information in public issues.
+Please do not include private audio, transcripts, personal file paths, phone numbers, or other sensitive data in public bug reports.
 
-If you believe you found a security problem, contact the project owner privately before publishing details.
+For reproducible issues, share only the minimum log excerpt required to diagnose the problem.
