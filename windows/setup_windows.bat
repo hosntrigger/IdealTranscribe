@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ============================================
-echo  Local Transcriber - Universal Windows V2
+echo  Ideal Transcribe - Universal Windows V2
 echo ============================================
 echo.
 
@@ -18,6 +18,6 @@ if errorlevel 1 (
 python -m pip install -r requirements.txt
 
 echo.
-echo Fertig. Danach LocalTranscriber.bat starten.
+echo Fertig. Danach IdealTranscribe.bat starten.
 echo whisper.cpp, FFmpeg und Modelle koennen direkt in der GUI eingerichtet werden.
 pause
