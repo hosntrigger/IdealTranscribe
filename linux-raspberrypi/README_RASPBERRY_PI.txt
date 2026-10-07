@@ -26,8 +26,8 @@ Pi-spezifisch unter der Haube:
 - vorhandene Modelle werden per Symlink eingebunden
 
 Alte GUI entfernen:
-  chmod +x UNINSTALL_OLD_VERSION.sh
-  ./UNINSTALL_OLD_VERSION.sh
+  chmod +x UNINSTALL_IDEAL_TRANSCRIBE.sh
+  ./UNINSTALL_IDEAL_TRANSCRIBE.sh
 
 Neue Version installieren:
   chmod +x install.sh
