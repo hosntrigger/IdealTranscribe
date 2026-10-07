@@ -27,7 +27,7 @@ except Exception:
     DND_FILES = None
     DND_AVAILABLE = False
 
-APP_NAME = "Local Transcriber"
+APP_NAME = "Ideal Transcribe"
 APP_VERSION = "1.0.0"
 SUPPORT_URL = "https://paypal.me/gottschn"
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -444,7 +444,7 @@ class App(BaseTk):
             if BRAND_MARK_PNG.exists():
                 _brand_src = tk.PhotoImage(file=str(BRAND_MARK_PNG))
                 # Compact header mark: approximately the visual height of
-                # "Local Transcriber" + "by IDEALVISUAL", without changing
+                # "Ideal Transcribe" + "by IDEALVISUAL", without changing
                 # the underlying approved artwork.
                 self.brand_mark_img = _brand_src.subsample(2, 2)
                 self._brand_src_img = _brand_src
@@ -642,7 +642,7 @@ class App(BaseTk):
 
         text_hdr = ttk.Frame(left_hdr)
         text_hdr.pack(side="left", fill="x", expand=True)
-        ttk.Label(text_hdr, text="Local Transcriber", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(text_hdr, text="Ideal Transcribe", style="Title.TLabel").pack(anchor="w")
         ttk.Label(text_hdr, text="by IDEALVISUAL", style="BrandTag.TLabel").pack(anchor="w", pady=(1, 0))
 
         self.hw_label = ttk.Label(
@@ -1016,7 +1016,7 @@ class App(BaseTk):
             f"Aktiver Build: {backend}\n"
             f"Hardware: {self.hw.get('gpu', 'Unbekannt')}\n\n"
             "Alle Transkriptionen erfolgen lokal auf diesem Computer.\n\n"
-            "Local Transcriber ist kostenlos. Wenn dir das Tool hilft,\n"
+            "Ideal Transcribe ist kostenlos. Wenn dir das Tool hilft,\n"
             "kannst du die Weiterentwicklung freiwillig unterstützen.\n\n"
             "Projekt unterstützen:\n"
             f"{SUPPORT_URL}"
@@ -1028,11 +1028,11 @@ class App(BaseTk):
         if running:
             msg = (
                 "Es läuft gerade eine Transkription.\n\n"
-                "Wenn du Local Transcriber jetzt schließt, wird der laufende Vorgang abgebrochen.\n\n"
+                "Wenn du Ideal Transcribe jetzt schließt, wird der laufende Vorgang abgebrochen.\n\n"
                 "Wirklich beenden?"
             )
         else:
-            msg = "Local Transcriber wirklich beenden?"
+            msg = "Ideal Transcribe wirklich beenden?"
 
         if not messagebox.askyesno(APP_NAME, msg):
             return
@@ -1070,7 +1070,7 @@ class App(BaseTk):
             if messagebox.askyesno(
                 APP_NAME,
                 "Die benötigten Komponenten sind noch nicht vollständig eingerichtet.\n\n"
-                "Soll Local Transcriber whisper.cpp und FFmpeg jetzt automatisch einrichten?"
+                "Soll Ideal Transcribe whisper.cpp und FFmpeg jetzt automatisch einrichten?"
             ):
                 self.auto_setup()
 
@@ -1346,7 +1346,7 @@ class App(BaseTk):
 
                     if want_cuda and whisper_build_backend(current) != "CUDA":
                         raise RuntimeError(
-                            "CUDA-Build wurde angefordert, aber Local Transcriber findet "
+                            "CUDA-Build wurde angefordert, aber Ideal Transcribe findet "
                             "weiterhin nur den CPU-Build."
                         )
 
@@ -1408,7 +1408,7 @@ class App(BaseTk):
             msg += "\n\nCPU-Build ist aktiv."
         if not self.ffmpeg:
             msg += "\n\nHinweis: FFmpeg wurde installiert, aber noch nicht gefunden. "
-            msg += "In diesem Fall Local Transcriber einmal neu starten."
+            msg += "In diesem Fall Ideal Transcribe einmal neu starten."
         messagebox.showinfo(APP_NAME, msg)
 
     def remote_model_info(self, url):
