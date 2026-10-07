@@ -16,6 +16,9 @@ First public release of **Local Transcriber by IDEALVISUAL**.
 - Dark and Light themes
 - Raspberry Pi thermal protection
 
+### Windows SmartScreen
+The current Windows build is not digitally signed. Microsoft Defender SmartScreen may show a warning such as **"Windows protected your PC"** when the app is started for the first time. This can happen because the executable is new and has no established SmartScreen reputation. If you downloaded it from the official GitHub release, choose **More info → Run anyway** if you want to proceed.
+
 ### Privacy
 Transcription runs locally on the device.
 
