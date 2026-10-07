@@ -1,7 +1,7 @@
 from pathlib import Path
 import ast
 
-src = Path(__file__).with_name("local_transcriber.py")
+src = Path(__file__).with_name("ideal_transcribe.py")
 text = src.read_text(encoding="utf-8")
 ast.parse(text)
 
