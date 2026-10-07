@@ -2,13 +2,15 @@
 set -euo pipefail
 
 APP_DIR="$HOME/.local/share/local-transcriber"
-BIN_LINK="$HOME/.local/bin/local-transcriber"
-DESKTOP_FILE="$HOME/.local/share/applications/local-transcriber.desktop"
+BIN_LINK="$HOME/.local/bin/ideal-transcribe"
+LEGACY_BIN_LINK="$HOME/.local/bin/local-transcriber"
+DESKTOP_FILE="$HOME/.local/share/applications/ideal-transcribe.desktop"
+LEGACY_DESKTOP_FILE="$HOME/.local/share/applications/local-transcriber.desktop"
 
 echo "Deinstalliere die aktuell installierte Local-Transcriber-GUI ..."
 rm -rf "$APP_DIR"
-rm -f "$BIN_LINK"
-rm -f "$DESKTOP_FILE"
+rm -f "$BIN_LINK" "$LEGACY_BIN_LINK"
+rm -f "$DESKTOP_FILE" "$LEGACY_DESKTOP_FILE"
 
 echo
 echo "Fertig."
