@@ -21,9 +21,9 @@ jobs:
       - name: Build EXE
         working-directory: windows
         run: |
-          python -m PyInstaller --noconfirm --clean --onefile --windowed --name LocalTranscriber --icon "assets\localtranscriber_icon.ico" --add-data "assets;assets" --collect-all tkinterdnd2 local_transcriber.py
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name IdealTranscribe --icon "assets\localtranscriber_icon.ico" --add-data "assets;assets" --collect-all tkinterdnd2 local_transcriber.py
 
       - uses: actions/upload-artifact@v4
         with:
-          name: LocalTranscriber-Windows
-          path: windows/dist/LocalTranscriber.exe
+          name: IdealTranscribe-Windows
+          path: windows/dist/IdealTranscribe.exe
