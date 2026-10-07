@@ -8,7 +8,7 @@ DESKTOP_DIR="$HOME/.local/share/applications"
 VENV_DIR="$APP_DIR/venv"
 
 echo "===================================================="
-echo " Local Transcriber 1.0.0 – Raspberry Pi FINAL"
+echo " Ideal Transcribe 1.0.0 – Raspberry Pi FINAL"
 echo "===================================================="
 echo
 echo "Bestehendes whisper.cpp und vorhandene Modelle bleiben erhalten."
@@ -54,24 +54,26 @@ exec "$VENV_DIR/bin/python" "$APP_DIR/local_transcriber.py" "\$@"
 EOF
 chmod +x "$APP_DIR/run.sh"
 
-ln -sf "$APP_DIR/run.sh" "$BIN_DIR/local-transcriber"
+rm -f "$BIN_DIR/local-transcriber"
+ln -sf "$APP_DIR/run.sh" "$BIN_DIR/ideal-transcribe"
 
-cat > "$DESKTOP_DIR/local-transcriber.desktop" <<EOF
+rm -f "$DESKTOP_DIR/local-transcriber.desktop"
+cat > "$DESKTOP_DIR/ideal-transcribe.desktop" <<EOF
 [Desktop Entry]
 Type=Application
-Name=Local Transcriber
+Name=Ideal Transcribe
 Comment=Lokale Audio- und Video-Transkription
 Exec=$APP_DIR/run.sh
 Icon=$APP_DIR/assets/localtranscriber_icon_256.png
 Terminal=false
-Categories=AudioVideo;Utility;
+Categories=AudioVideo;Audio;Video;
 StartupNotify=true
 EOF
 chmod +x "$DESKTOP_DIR/local-transcriber.desktop"
 
 echo
 echo "Installation abgeschlossen."
-echo "Start im Terminal: local-transcriber"
-echo "Oder im Anwendungsmenü: Local Transcriber"
+echo "Start im Terminal: ideal-transcribe"
+echo "Oder im Anwendungsmenü: Ideal Transcribe"
 echo
 echo "Vorhandenes whisper.cpp unter ~/whisper.cpp wird automatisch erkannt."
