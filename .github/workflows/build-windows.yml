@@ -1,8 +1,6 @@
 name: Build Windows EXE
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -14,6 +12,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Validate source
+        working-directory: windows
+        run: python -m py_compile ideal_transcribe.py
 
       - name: Install build dependencies
         run: |
