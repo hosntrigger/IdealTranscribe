@@ -33,10 +33,10 @@ APP_VERSION = "1.0.0"
 SUPPORT_URL = "https://paypal.me/gottschn"
 SCRIPT_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = SCRIPT_DIR / "assets"
-APP_ICON_PNG = ASSETS_DIR / "localtranscriber_icon_256.png"
-APP_ICON_ICO = ASSETS_DIR / "localtranscriber_icon.ico"
+APP_ICON_PNG = ASSETS_DIR / "idealtranscribe_icon_256.png"
+APP_ICON_ICO = ASSETS_DIR / "idealtranscribe_icon.ico"
 BRAND_MARK_PNG = ASSETS_DIR / "idealvisual_mark_small.png"
-APPDATA = Path.home() / ".local" / "share" / "LocalTranscriber"
+APPDATA = Path.home() / ".local" / "share" / "IdealTranscribe"
 APPDATA.mkdir(parents=True, exist_ok=True)
 BIN_DIR = APPDATA / "bin"
 MODEL_DIR = APPDATA / "models"
@@ -1168,7 +1168,7 @@ class App(BaseTk):
                 req = urllib.request.Request(
                     url,
                     headers={
-                        "User-Agent": "LocalTranscriber/2.4.1",
+                        "User-Agent": "IdealTranscribe/2.4.1",
                         "Accept": "application/vnd.github+json",
                         "Accept-Encoding": "identity",
                         "Connection": "close",
@@ -1186,7 +1186,7 @@ class App(BaseTk):
                 [
                     curl, "-L", "--fail", "--silent", "--show-error",
                     "--retry", "4", "--retry-delay", "2",
-                    "-H", "User-Agent: LocalTranscriber/2.4.1",
+                    "-H", "User-Agent: IdealTranscribe/2.4.1",
                     "-H", "Accept: application/vnd.github+json",
                     url
                 ],
@@ -1289,7 +1289,7 @@ class App(BaseTk):
                 req = urllib.request.Request(
                     url,
                     headers={
-                        "User-Agent": "LocalTranscriber/2.4.1",
+                        "User-Agent": "IdealTranscribe/2.4.1",
                         "Accept-Encoding": "identity",
                         "Connection": "close",
                     }
@@ -1336,7 +1336,7 @@ class App(BaseTk):
                     curl, "-L", "--fail", "--show-error",
                     "--retry", "5", "--retry-all-errors",
                     "--retry-delay", "2",
-                    "-A", "LocalTranscriber/2.4.1",
+                    "-A", "IdealTranscribe/2.4.1",
                     "-o", str(target),
                     url
                 ],
@@ -1468,7 +1468,7 @@ class App(BaseTk):
         req = urllib.request.Request(
             url,
             method="HEAD",
-            headers={"User-Agent": "LocalTranscriber"}
+            headers={"User-Agent": "IdealTranscribe"}
         )
         with urllib.request.urlopen(req, timeout=30) as r:
             headers = r.headers
