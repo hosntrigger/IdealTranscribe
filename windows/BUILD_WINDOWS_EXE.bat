@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ====================================================
-echo Local Transcriber 1.0.0 - Windows EXE Builder
+echo Ideal Transcribe 1.0.0 - Windows EXE Builder
 echo ====================================================
 echo.
 echo Erstellt lokal eine EXE. Kein Upload, kein Release.
@@ -13,7 +13,7 @@ python -m pip install --upgrade pyinstaller tkinterdnd2
 if errorlevel 1 goto :fail
 
 python -m PyInstaller --noconfirm --clean --onefile --windowed ^
-  --name "LocalTranscriber" ^
+  --name "IdealTranscribe" ^
   --icon "assets\localtranscriber_icon.ico" ^
   --add-data "assets;assets" ^
   --collect-all tkinterdnd2 ^
@@ -22,7 +22,7 @@ if errorlevel 1 goto :fail
 
 echo.
 echo Fertig:
-echo %CD%\dist\LocalTranscriber.exe
+echo %CD%\dist\IdealTranscribe.exe
 echo.
 pause
 exit /b 0
