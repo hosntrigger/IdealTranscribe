@@ -1,6 +1,6 @@
-# Local Transcriber 1.0.0
+# Ideal Transcribe 1.0.0
 
-First public release of **Local Transcriber by IDEALVISUAL**.
+First public release of **Ideal Transcribe by IDEALVISUAL**.
 
 ### Highlights
 - Fast local transcription with whisper.cpp
@@ -26,6 +26,6 @@ Transcription runs locally on the device.
 https://paypal.me/gottschn
 
 ### License
-Local Transcriber 1.0.0 is free for permitted noncommercial use under the PolyForm Noncommercial License 1.0.0. Commercial or business use requires a separate commercial license from IDEALVISUAL.
+Ideal Transcribe 1.0.0 is free for permitted noncommercial use under the PolyForm Noncommercial License 1.0.0. Commercial or business use requires a separate commercial license from IDEALVISUAL.
 
 Third-party components retain their own licenses.
