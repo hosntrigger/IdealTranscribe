@@ -2,7 +2,7 @@
 
 For bugs and feature requests, use GitHub Issues after the public repository is available.
 
-Local Transcriber is free for permitted noncommercial use. Commercial use requires a separate license.
+Ideal Transcribe is free for permitted noncommercial use. Commercial use requires a separate license.
 
 Voluntary support for further development:
 
