@@ -68,7 +68,7 @@ Ideal Transcribe by **IDEALVISUAL** turns audio and video files into text **on y
 ### Windows
 
 1. Open the [latest release](https://github.com/hosntrigger/IdealTranscribe/releases/latest).
-2. Download **`IdealTranscribe_1.0.0_Windows_FINAL.zip`**.
+2. Download the current **Windows FINAL** ZIP from the latest release.
 3. Extract the ZIP.
 4. Start **`IdealTranscribe.exe`**.
 5. Let Ideal Transcribe set up the required components/model, then add an audio or video file.
@@ -78,7 +78,7 @@ Ideal Transcribe by **IDEALVISUAL** turns audio and video files into text **on y
 ### Raspberry Pi
 
 1. Open the [latest release](https://github.com/hosntrigger/IdealTranscribe/releases/latest).
-2. Download **`IdealTranscribe_1.0.0_RaspberryPi_FINAL.zip`**.
+2. Download the current **Raspberry Pi FINAL** ZIP from the latest release.
 3. Extract it and open a terminal in the extracted folder.
 4. Run:
 
