@@ -1,0 +1,52 @@
+name: Build 1.1 UI Translation Preview
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile source
+        working-directory: windows
+        run: python -m py_compile ideal_transcribe.py
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller tkinterdnd2
+      - name: Build EXE
+        working-directory: windows
+        run: |
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name IdealTranscribe --icon "assets\idealtranscribe_icon.ico" --add-data "assets;assets" --collect-all tkinterdnd2 ideal_transcribe.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IdealTranscribe-1.1.0-Windows-Preview
+          path: windows/dist/IdealTranscribe.exe
+
+  raspberry-pi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate source and scripts
+        run: |
+          python -m py_compile linux-raspberrypi/ideal_transcribe.py
+          bash -n linux-raspberrypi/install.sh
+          bash -n linux-raspberrypi/UNINSTALL_IDEAL_TRANSCRIBE.sh
+      - name: Package Raspberry Pi preview
+        run: |
+          mkdir -p preview/IdealTranscribe_1.1.0_RaspberryPi_PREVIEW
+          cp -r linux-raspberrypi/* preview/IdealTranscribe_1.1.0_RaspberryPi_PREVIEW/
+          cd preview
+          zip -r IdealTranscribe_1.1.0_RaspberryPi_PREVIEW.zip IdealTranscribe_1.1.0_RaspberryPi_PREVIEW
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IdealTranscribe-1.1.0-RaspberryPi-Preview
+          path: preview/IdealTranscribe_1.1.0_RaspberryPi_PREVIEW.zip

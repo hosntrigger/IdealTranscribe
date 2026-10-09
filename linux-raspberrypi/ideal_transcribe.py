@@ -29,7 +29,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "Ideal Transcribe"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.1.0"
 SUPPORT_URL = "https://paypal.me/gottschn"
 SCRIPT_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = SCRIPT_DIR / "assets"
@@ -121,6 +121,268 @@ TS_RE = re.compile(
 )
 
 CREATE_NO_WINDOW = 0x08000000 if os.name == "nt" else 0
+
+# UI language layer. Internal workflow values remain canonical so changing the
+# interface language never changes transcription behavior.
+CURRENT_UI_LANGUAGE = "de"
+
+UI_TRANSLATIONS = {
+    "♥ Projekt unterstützen": "♥ Support project",
+    "Über": "About",
+    "🌙 Dunkel": "🌙 Dark",
+    "☀ Hell": "☀ Light",
+    "Lokale Stapeltranskription • Drag & Drop • whisper.cpp • automatische Audioaufbereitung":
+        "Local batch transcription • Drag & Drop • whisper.cpp • automatic audio preparation",
+    "▶ Transkribieren": "▶ Transcribe",
+    "▶ Fortsetzen": "▶ Resume",
+    "⏸ Pause": "⏸ Pause",
+    "Abbrechen": "Cancel",
+    "Bereit": "Ready",
+    "System & Modelle": "System & Models",
+    "Laufzeit: noch nicht gestartet": "Runtime: not started",
+    "Alles automatisch einrichten": "Set up automatically",
+    "Komponenten prüfen": "Check components",
+    "Dateien": "Files",
+    "Audio-/Videodateien hier hineinziehen oder über „Dateien hinzufügen“ auswählen":
+        "Drop audio/video files here or choose “Add files”",
+    "Dateien hinzufügen": "Add files",
+    "Modell:": "Model:",
+    "★ Empfohlen": "★ Recommended",
+    "Empfohlen verwenden": "Use recommended",
+    "Modell verwalten…": "Manage models…",
+    "Sprache:": "Language:",
+    "Leistungsmodus:": "Performance mode:",
+    "Speicherort": "Output location",
+    "Gleicher Ordner": "Same folder",
+    "Unterordner „transkripte“": "Subfolder “transcripts”",
+    "Benutzerdefiniert": "Custom",
+    "Ordner wählen…": "Choose folder…",
+    "Noch kein Zielordner gewählt": "No output folder selected",
+    "Audioaufbereitung": "Audio preparation",
+    "Modus:": "Mode:",
+    "Konvertierte Audiodatei behalten": "Keep converted audio file",
+    "Auto: problematische Formate → FLAC, danach temporäre Datei löschen":
+        "Auto: problematic formats → FLAC, then delete temporary file",
+    "Datei": "File",
+    "Dauer": "Duration",
+    "Status": "Status",
+    "Ausgabe": "Output",
+    "Live-Ausgabe": "Live output",
+    "Wartend": "Waiting",
+    "Vorbereitung": "Preparing",
+    "Konvertierungsfehler": "Conversion error",
+    "Transkribiert": "Transcribing",
+    "Fertig": "Done",
+    "Fehler": "Error",
+    "Bitte warten …": "Please wait …",
+    "Whisper-Modelle": "Whisper models",
+    "Modelle verwalten": "Manage models",
+    "Empfohlene Modelle installieren": "Install recommended models",
+    "Alle Modelle installieren": "Install all models",
+    "Alle installierten Modelle auf Updates prüfen": "Check all installed models for updates",
+    "Herunterladen": "Download",
+    "Aktualisieren": "Update",
+    "Deinstallieren": "Uninstall",
+    "Ausgewählte entfernen": "Remove selected",
+    "Update prüfen": "Check for update",
+    "Empfohlene Modelle": "Recommended models",
+    "Alle Modelle": "All models",
+    "Automatische Einrichtung": "Automatic setup",
+    "Original verwenden": "Use original",
+    "Automatisch (FLAC)": "Automatic (FLAC)",
+    "WAV verlustfrei": "Lossless WAV",
+    "MP3 kompatibel": "Compatible MP3",
+    "Schonend": "Gentle",
+    "Ausgeglichen": "Balanced",
+    "Maximal": "Maximum",
+    "Deutsch": "German",
+    "Englisch": "English",
+    "Auto": "Auto",
+    "Quantisiert": "Quantized",
+    "Max. Qualität": "Max. quality",
+    "Effizient": "Efficient",
+    "Schnell + kompakt": "Fast + compact",
+    "Solider Allrounder": "Solid all-rounder",
+    "Mehr Qualität / langsamer": "Higher quality / slower",
+    "(fehlt)": "(missing)",
+    "nicht installiert": "not installed",
+    "prüfe…": "checking…",
+    "Prüfung fehlgeschlagen": "Check failed",
+    "Keine Vorab-Konvertierung": "No pre-conversion",
+    "Alle Dateien → WAV 16 kHz Mono PCM": "All files → WAV 16 kHz mono PCM",
+    "Alle Dateien → MP3 64 kbit/s Mono": "All files → MP3 64 kbit/s mono",
+    "Auto: problematische Formate → FLAC (16 kHz, Mono, verlustfrei komprimiert)":
+        "Auto: problematic formats → FLAC (16 kHz, mono, lossless compression)",
+    "Über Ideal Transcribe": "About Ideal Transcribe",
+}
+
+# Longer phrases first so runtime messages and f-strings translate cleanly.
+UI_REPLACEMENTS = {
+    "Alle Transkriptionen erfolgen lokal auf diesem Computer.": "All transcriptions are processed locally on this computer.",
+    "Lokale Audio-/Video-Transkription mit whisper.cpp.": "Local audio/video transcription with whisper.cpp.",
+    "Ideal Transcribe ist kostenlos. Wenn dir das Tool hilft,": "Ideal Transcribe is free. If the tool helps you,",
+    "kannst du die Weiterentwicklung freiwillig unterstützen.": "you can voluntarily support further development.",
+    "Projekt unterstützen:": "Support project:",
+    "Aktiver Build:": "Active build:",
+    "Unbekannt": "Unknown",
+    "Es läuft gerade eine Transkription.": "A transcription is currently running.",
+    "Wenn du Ideal Transcribe jetzt schließt, wird der laufende Vorgang abgebrochen.":
+        "If you close Ideal Transcribe now, the running job will be cancelled.",
+    "Wirklich beenden?": "Really quit?",
+    "Ideal Transcribe wirklich beenden?": "Really quit Ideal Transcribe?",
+    "Die benötigten Komponenten sind noch nicht vollständig eingerichtet.":
+        "The required components are not fully set up yet.",
+    "Soll Ideal Transcribe whisper.cpp und FFmpeg jetzt automatisch einrichten?":
+        "Should Ideal Transcribe set up whisper.cpp and FFmpeg automatically now?",
+    "Bitte zuerst „Alles automatisch einrichten“ ausführen.": "Please run “Set up automatically” first.",
+    "Bitte zuerst Dateien hinzufügen.": "Please add files first.",
+    "Bitte einen benutzerdefinierten Zielordner wählen.": "Please choose a custom output folder.",
+    "Eine NVIDIA-GPU wurde erkannt, aber aktuell ist der CPU-Build aktiv.":
+        "An NVIDIA GPU was detected, but the CPU build is currently active.",
+    "Soll die automatische Einrichtung jetzt versuchen, den CUDA-Build zu installieren?":
+        "Should automatic setup try to install the CUDA build now?",
+    "Transkription starten?": "Start transcription?",
+    "Während der Verarbeitung kann das System träger reagieren.": "The system may respond more slowly during processing.",
+    "Der Temperaturschutz pausiert automatisch ab 78 °C.": "Thermal protection pauses automatically at 78 °C.",
+    "Bitte bis unter": "Please let it cool below",
+    "Der Raspberry Pi ist aktuell": "The Raspberry Pi is currently",
+    "ist noch nicht installiert.": "is not installed yet.",
+    "Jetzt herunterladen?": "Download now?",
+    "Backend gewählt:": "Backend selected:",
+    "CUDA verfügbar": "CUDA available",
+    "Laufzeit:": "Runtime:",
+    "keine GPU aktiv": "no GPU active",
+    "GPU aktiv": "GPU active",
+    "Whisper: ✓ installiert": "Whisper: ✓ installed",
+    "Whisper: ✗ fehlt": "Whisper: ✗ missing",
+    "FFmpeg: ✓ installiert": "FFmpeg: ✓ installed",
+    "FFmpeg: ✗ fehlt": "FFmpeg: ✗ missing",
+    "Einrichtung: Komponenten werden geprüft …": "Setup: checking components …",
+    "Einrichtung fertig:": "Setup complete:",
+    "Einrichtung fehlgeschlagen": "Setup failed",
+    "Automatische Einrichtung fehlgeschlagen:": "Automatic setup failed:",
+    "Komponenten wurden eingerichtet.": "Components were set up.",
+    "NVIDIA-GPU erkannt: ein CUDA-Build wird bevorzugt, sofern verfügbar.":
+        "NVIDIA GPU detected: a CUDA build is preferred when available.",
+    "CPU-Build ist aktiv.": "CPU build is active.",
+    "Hinweis: FFmpeg wurde installiert, aber noch nicht gefunden.":
+        "Note: FFmpeg was installed but has not been found yet.",
+    "In diesem Fall Ideal Transcribe einmal neu starten.": "In this case, restart Ideal Transcribe once.",
+    "Empfohlenes Modell:": "Recommended model:",
+    "Empfohlen für diese Hardware:": "Recommended for this hardware:",
+    "Empfohlen: ca.": "Recommended: approx.",
+    "alle: ca.": "all: approx.",
+    "Hardware:": "Hardware:",
+    "Empfehlungen werden automatisch angepasst.": "Recommendations are adjusted automatically.",
+    "Das Fenster bleibt beim Installieren, Aktualisieren und Deinstallieren geöffnet.":
+        "This window stays open while installing, updating and uninstalling.",
+    "Alle zugehörigen Modelle sind bereits installiert.": "All related models are already installed.",
+    "Es werden": "Downloading",
+    "Modell(e) heruntergeladen.": "model(s).",
+    "Geschätzter zusätzlicher Speicherbedarf: ca.": "Estimated additional storage required: approx.",
+    "Freier Speicher auf dem Ziellaufwerk: ca.": "Free space on the target drive: approx.",
+    "Der Download kann je nach Internetverbindung längere Zeit dauern.":
+        "The download may take some time depending on your internet connection.",
+    "Der freie Speicher könnte dafür nicht ausreichen.": "There may not be enough free disk space.",
+    "wird heruntergeladen…": "is downloading…",
+    "wird aktualisiert…": "is updating…",
+    "wird geladen…": "is loading…",
+    "wurde installiert.": "was installed.",
+    "wurde aktualisiert.": "was updated.",
+    "wirklich deinstallieren?": "really uninstall?",
+    "Deinstallation fehlgeschlagen:": "Uninstall failed:",
+    "Modelldownload fehlgeschlagen:": "Model download failed:",
+    "Modell-Update fehlgeschlagen:": "Model update failed:",
+    "Die heruntergeladene Modelldatei ist unvollständig.": "The downloaded model file is incomplete.",
+    "heruntergeladene Datei ist unvollständig.": "downloaded file is incomplete.",
+    "Stapelinstallation abgebrochen.": "Batch installation cancelled.",
+    "Erfolgreich installiert:": "Successfully installed:",
+    "Bereits vollständig installierte Modelle bleiben erhalten.":
+        "Models that were already fully installed are kept.",
+    "Zielordner auswählen": "Select output folder",
+    "Audio-/Videodateien auswählen": "Select audio/video files",
+    "Alle Dateien": "All files",
+    "Audio-Konvertierung fehlgeschlagen.": "Audio conversion failed.",
+    "FFmpeg fehlt.": "FFmpeg is missing.",
+    "Abbruch wird ausgeführt…": "Cancelling…",
+    "Abgebrochen.": "Cancelled.",
+    "Stapelverarbeitung abgeschlossen.": "Batch processing complete.",
+    "Transkription läuft weiter …": "Transcription resumed …",
+    "Pausiert.": "Paused.",
+    "Fortgesetzt": "Resumed",
+    "Pausiert": "Paused",
+    "Pause fehlgeschlagen:": "Pause failed:",
+    "Fortsetzen fehlgeschlagen:": "Resume failed:",
+    "Support-Link konnte nicht geöffnet werden:": "Could not open support link:",
+    "Drag & Drop konnte nicht aktiviert werden:": "Could not enable Drag & Drop:",
+    "Datei ": "File ",
+    "Datei": "File",
+    "Modell": "Model",
+    "Leistungsmodus": "Performance mode",
+    "CPU-Temperatur": "CPU temperature",
+    "nicht verfügbar": "not available",
+    "Threads": "threads",
+    "FEHLER": "ERROR",
+    "Fehler": "Error",
+    "Fertig": "Done",
+    "Wartend": "Waiting",
+    "Vorbereitung": "Preparing",
+}
+
+CHOICE_TRANSLATIONS = {
+    "Deutsch": {"de": "Deutsch", "en": "German"},
+    "Englisch": {"de": "Englisch", "en": "English"},
+    "Auto": {"de": "Auto", "en": "Auto"},
+    "Schonend": {"de": "Schonend", "en": "Gentle"},
+    "Ausgeglichen": {"de": "Ausgeglichen", "en": "Balanced"},
+    "Maximal": {"de": "Maximal", "en": "Maximum"},
+    "Automatisch (FLAC)": {"de": "Automatisch (FLAC)", "en": "Automatic (FLAC)"},
+    "WAV verlustfrei": {"de": "WAV verlustfrei", "en": "Lossless WAV"},
+    "MP3 kompatibel": {"de": "MP3 kompatibel", "en": "Compatible MP3"},
+    "Original verwenden": {"de": "Original verwenden", "en": "Use original"},
+}
+
+def set_ui_language(lang):
+    global CURRENT_UI_LANGUAGE
+    CURRENT_UI_LANGUAGE = lang if lang in ("de", "en") else "de"
+
+def translate_ui_text(text, lang=None):
+    if text is None:
+        return text
+    lang = lang or CURRENT_UI_LANGUAGE
+    text = str(text)
+    if lang != "en":
+        return text
+    if text in UI_TRANSLATIONS:
+        return UI_TRANSLATIONS[text]
+    out = text
+    for src in sorted(UI_REPLACEMENTS, key=len, reverse=True):
+        out = out.replace(src, UI_REPLACEMENTS[src])
+    return out
+
+def display_choice(canonical, lang):
+    item = CHOICE_TRANSLATIONS.get(canonical)
+    return item.get(lang, canonical) if item else canonical
+
+def canonical_choice(value):
+    for canonical, labels in CHOICE_TRANSLATIONS.items():
+        if value == canonical or value in labels.values():
+            return canonical
+    return value
+
+# Translate native message-box text without changing any workflow logic.
+for _msg_name in ("showinfo", "showwarning", "showerror", "askyesno", "askokcancel"):
+    _original = getattr(messagebox, _msg_name)
+    def _make_message_wrapper(func):
+        def _wrapped(title, message, *args, **kwargs):
+            return func(
+                translate_ui_text(title),
+                translate_ui_text(message),
+                *args,
+                **kwargs
+            )
+        return _wrapped
+    setattr(messagebox, _msg_name, _make_message_wrapper(_original))
 PI_TEMP_PAUSE_C = 78.0
 PI_TEMP_RESUME_C = 70.0
 PI_TEMP_CHECK_SECONDS = 3.0
@@ -343,7 +605,7 @@ def primary_recommended_model(hw):
 class DownloadDialog(tk.Toplevel):
     def __init__(self, parent, title):
         super().__init__(parent)
-        self.title(title)
+        self.title(translate_ui_text(title))
         self.transient(parent)
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", lambda: None)
@@ -351,7 +613,7 @@ class DownloadDialog(tk.Toplevel):
         box = ttk.Frame(self, padding=16)
         box.pack(fill="both", expand=True)
 
-        self.label = ttk.Label(box, text="Bitte warten …", width=62)
+        self.label = ttk.Label(box, text=translate_ui_text("Bitte warten …"), width=62)
         self.label.pack(fill="x")
 
         self.progress = ttk.Progressbar(box, maximum=100, mode="determinate")
@@ -373,8 +635,8 @@ class DownloadDialog(tk.Toplevel):
     def update_progress(self, label, percent=None, detail=""):
         if not self.winfo_exists():
             return
-        self.label.config(text=label)
-        self.detail.config(text=detail or "")
+        self.label.config(text=translate_ui_text(label))
+        self.detail.config(text=translate_ui_text(detail or ""))
 
         if percent is None:
             self.progress.config(mode="indeterminate")
@@ -398,7 +660,12 @@ class App(BaseTk):
     def __init__(self):
         super().__init__()
         self.title(f"{APP_NAME} {APP_VERSION}")
-        self.theme_name = cfg_load().get("theme", "dark")  # fresh install default: dark
+        self.cfg = cfg_load()
+        self.ui_language = self.cfg.get("ui_language", "de")
+        if self.ui_language not in ("de", "en"):
+            self.ui_language = "de"
+        set_ui_language(self.ui_language)
+        self.theme_name = self.cfg.get("theme", "dark")  # fresh install default: dark
         if self.theme_name not in ("dark", "light"):
             self.theme_name = "dark"
         self.setup_brand_theme()
@@ -407,7 +674,6 @@ class App(BaseTk):
         self.geometry("1140x820")
         self.minsize(980, 700)
 
-        self.cfg = cfg_load()
         if self.cfg.get("audio_mode") in ("Automatisch (M4A/AAC)", "Automatisch (AAC/M4A)"):
             self.cfg["audio_mode"] = "Automatisch (FLAC)"
             cfg_save(self.cfg)
@@ -426,6 +692,8 @@ class App(BaseTk):
         self.custom_output = Path(self.cfg["custom_output"]) if self.cfg.get("custom_output") else None
 
         self.build_ui()
+        self.bind_all("<Map>", self._on_widget_map, add="+")
+        self.apply_ui_language()
         self.refresh_models()
         self.refresh_component_status()
 
@@ -628,9 +896,106 @@ class App(BaseTk):
         cfg_save(current)
         self.setup_brand_theme()
         if hasattr(self, "theme_btn"):
-            self.theme_btn.configure(
-                text="🌙 Dunkel" if self.theme_name == "light" else "☀ Hell"
+            source = "🌙 Dunkel" if self.theme_name == "light" else "☀ Hell"
+            self.theme_btn._i18n_source_text = source
+            self.theme_btn.configure(text=self.tr(source))
+
+
+    def tr(self, text):
+        return translate_ui_text(text, self.ui_language)
+
+    def _on_widget_map(self, event=None):
+        widget = getattr(event, "widget", None)
+        if widget is not None:
+            self.after_idle(lambda w=widget: self.apply_ui_language(w))
+
+    def apply_ui_language(self, root=None):
+        set_ui_language(self.ui_language)
+        root = root or self
+
+        def walk(widget):
+            try:
+                current = widget.cget("text")
+                if current:
+                    if not hasattr(widget, "_i18n_source_text"):
+                        widget._i18n_source_text = current
+                    widget.configure(text=self.tr(widget._i18n_source_text))
+            except Exception:
+                pass
+            try:
+                for child in widget.winfo_children():
+                    walk(child)
+            except Exception:
+                pass
+
+        walk(root)
+
+        if hasattr(self, "tree"):
+            for col, source in {
+                "file": "Datei",
+                "duration": "Dauer",
+                "status": "Status",
+                "output": "Ausgabe",
+            }.items():
+                try:
+                    self.tree.heading(col, text=self.tr(source))
+                except Exception:
+                    pass
+
+        self._apply_choice_translations()
+        if hasattr(self, "model_hint"):
+            self.update_model_hint()
+        if hasattr(self, "audio_info_label"):
+            self.update_audio_mode_info()
+        if hasattr(self, "profile_info"):
+            self.profile_changed()
+
+    def _apply_choice_translations(self):
+        if hasattr(self, "lang_var"):
+            canonical = canonical_choice(self.lang_var.get())
+            if canonical not in ("Deutsch", "Auto", "Englisch"):
+                canonical = self.cfg.get("language", "Deutsch")
+            self.lang_combo["values"] = [
+                display_choice(v, self.ui_language)
+                for v in ("Deutsch", "Auto", "Englisch")
+            ]
+            self.lang_var.set(display_choice(canonical, self.ui_language))
+
+        if hasattr(self, "profile_var"):
+            canonical = canonical_choice(self.profile_var.get())
+            if canonical not in RESOURCE_PROFILES:
+                canonical = self.cfg.get("profile", "Ausgeglichen")
+            self.profile_combo["values"] = [
+                display_choice(v, self.ui_language) for v in RESOURCE_PROFILES
+            ]
+            self.profile_var.set(display_choice(canonical, self.ui_language))
+
+        if hasattr(self, "audio_mode_var"):
+            canonical = canonical_choice(self.audio_mode_var.get())
+            allowed = (
+                "Automatisch (FLAC)",
+                "WAV verlustfrei",
+                "MP3 kompatibel",
+                "Original verwenden",
             )
+            if canonical not in allowed:
+                canonical = self.cfg.get("audio_mode", "Automatisch (FLAC)")
+            self.audio_mode_combo["values"] = [
+                display_choice(v, self.ui_language) for v in allowed
+            ]
+            self.audio_mode_var.set(display_choice(canonical, self.ui_language))
+
+    def change_ui_language(self, event=None):
+        selected = self.ui_lang_var.get()
+        self.ui_language = "en" if selected == "English" else "de"
+        set_ui_language(self.ui_language)
+        self.cfg["ui_language"] = self.ui_language
+        cfg_save(self.cfg)
+        self.apply_ui_language()
+        self.refresh_component_status()
+
+    def model_base_name(self, value):
+        return str(value).replace(" (fehlt)", "").replace(" (missing)", "").replace(" (missing)", "")
 
 
     def build_ui(self):
@@ -671,10 +1036,22 @@ class App(BaseTk):
 
         self.theme_btn = ttk.Button(
             hdr,
-            text="🌙 Dunkel" if self.theme_name == "light" else "☀ Hell",
+            text=self.tr("🌙 Dunkel" if self.theme_name == "light" else "☀ Hell"),
             command=self.toggle_theme
         )
+        self.theme_btn._i18n_source_text = "🌙 Dunkel" if self.theme_name == "light" else "☀ Hell"
         self.theme_btn.pack(side="right", padx=(0, 6))
+
+        self.ui_lang_var = tk.StringVar(value="English" if self.ui_language == "en" else "Deutsch")
+        self.ui_lang_combo = ttk.Combobox(
+            hdr,
+            textvariable=self.ui_lang_var,
+            values=["Deutsch", "English"],
+            state="readonly",
+            width=9
+        )
+        self.ui_lang_combo.pack(side="right", padx=(0, 6))
+        self.ui_lang_combo.bind("<<ComboboxSelected>>", self.change_ui_language)
 
         ttk.Label(
             main,
@@ -784,18 +1161,24 @@ class App(BaseTk):
         ttk.Button(row, text="Modell verwalten…", command=self.model_manager).pack(side="left", padx=(0, 12))
 
         ttk.Label(row, text="Sprache:").pack(side="left")
-        self.lang_var = tk.StringVar(value=self.cfg.get("language", "Deutsch"))
-        ttk.Combobox(
+        self.lang_var = tk.StringVar(
+            value=display_choice(self.cfg.get("language", "Deutsch"), self.ui_language)
+        )
+        self.lang_combo = ttk.Combobox(
             row, textvariable=self.lang_var,
-            values=["Deutsch", "Auto", "Englisch"],
+            values=[display_choice(v, self.ui_language) for v in ("Deutsch", "Auto", "Englisch")],
             state="readonly", width=12
-        ).pack(side="left", padx=(5, 12))
+        )
+        self.lang_combo.pack(side="left", padx=(5, 12))
 
         ttk.Label(row, text="Leistungsmodus:").pack(side="left")
-        self.profile_var = tk.StringVar(value=self.cfg.get("profile", "Ausgeglichen"))
+        self.profile_var = tk.StringVar(
+            value=display_choice(self.cfg.get("profile", "Ausgeglichen"), self.ui_language)
+        )
         self.profile_combo = ttk.Combobox(
             row, textvariable=self.profile_var,
-            values=list(RESOURCE_PROFILES), state="readonly", width=16
+            values=[display_choice(v, self.ui_language) for v in RESOURCE_PROFILES],
+            state="readonly", width=16
         )
         self.profile_combo.pack(side="left", padx=(5, 5))
         self.profile_info = ttk.Label(row, text="")
@@ -834,15 +1217,17 @@ class App(BaseTk):
             saved_audio_mode = "Automatisch (FLAC)"
             self.cfg["audio_mode"] = saved_audio_mode
             cfg_save(self.cfg)
-        self.audio_mode_var = tk.StringVar(value=saved_audio_mode)
+        self.audio_mode_var = tk.StringVar(
+            value=display_choice(saved_audio_mode, self.ui_language)
+        )
         self.audio_mode_combo = ttk.Combobox(
             ar,
             textvariable=self.audio_mode_var,
             values=[
-                "Automatisch (FLAC)",
-                "WAV verlustfrei",
-                "MP3 kompatibel",
-                "Original verwenden"
+                display_choice("Automatisch (FLAC)", self.ui_language),
+                display_choice("WAV verlustfrei", self.ui_language),
+                display_choice("MP3 kompatibel", self.ui_language),
+                display_choice("Original verwenden", self.ui_language)
             ],
             state="readonly",
             width=22
@@ -996,7 +1381,7 @@ class App(BaseTk):
 
         if self.paused:
             self.paused = False
-            self.pause_btn.config(text="⏸ Pause")
+            self.pause_btn.config(text=self.tr("⏸ Pause"))
             if self.thermal_paused:
                 self.ui_status(
                     f"Manuelle Pause aufgehoben • Temperaturschutz aktiv "
@@ -1009,7 +1394,7 @@ class App(BaseTk):
         else:
             if self._suspend_process():
                 self.paused = True
-                self.pause_btn.config(text="▶ Fortsetzen")
+                self.pause_btn.config(text=self.tr("▶ Fortsetzen"))
                 self.ui_status("Pausiert.")
                 self.log_line("\n--- Pausiert ---\n")
 
@@ -1358,7 +1743,7 @@ class App(BaseTk):
 
     def auto_setup(self):
         dlg = DownloadDialog(self, "Automatische Einrichtung")
-        self.runtime_status.config(text="Einrichtung: Komponenten werden geprüft …")
+        self.runtime_status.config(text=self.tr("Einrichtung: Komponenten werden geprüft …"))
 
         def worker():
             try:
@@ -1440,7 +1825,7 @@ class App(BaseTk):
                 self.after(0, dlg.destroy)
                 self.after(
                     0,
-                    lambda: self.runtime_status.config(text="Einrichtung fehlgeschlagen")
+                    lambda: self.runtime_status.config(text=self.tr("Einrichtung fehlgeschlagen"))
                 )
                 self.after(
                     0,
@@ -1486,11 +1871,11 @@ class App(BaseTk):
         target = MODEL_DIR / spec["file"]
         if not target.exists():
             if status_label:
-                status_label.config(text="nicht installiert")
+                status_label.config(text=self.tr("nicht installiert"))
             return
 
         if status_label:
-            status_label.config(text="prüfe…")
+            status_label.config(text=self.tr("prüfe…"))
         if button:
             button.config(state="disabled")
 
@@ -1528,7 +1913,7 @@ class App(BaseTk):
             except Exception as e:
                 err = str(e)
                 if status_label:
-                    self.after(0, lambda err=err: status_label.config(text=f"Prüfung fehlgeschlagen"))
+                    self.after(0, lambda err=err: status_label.config(text=self.tr("Prüfung fehlgeschlagen")))
             finally:
                 if button:
                     self.after(0, lambda: button.config(state="normal"))
@@ -2007,16 +2392,16 @@ class App(BaseTk):
     def refresh_models(self):
         vals = []
         for name, spec in MODEL_SPECS.items():
-            vals.append(name if (MODEL_DIR/spec["file"]).exists() else f"{name} (fehlt)")
+            vals.append(name if (MODEL_DIR/spec["file"]).exists() else f"{name} {self.tr('(fehlt)')}")
         self.model_combo["values"] = vals
 
-        base = self.model_var.get().replace(" (fehlt)", "")
+        base = self.model_var.get().replace(" (fehlt)", "").replace(" (missing)", "")
         if base not in MODEL_SPECS:
             base = primary_recommended_model(self.hw)
 
         matched = False
         for v in vals:
-            if v.replace(" (fehlt)", "") == base:
+            if v.replace(" (fehlt)", "").replace(" (missing)", "") == base:
                 self.model_var.set(v)
                 matched = True
                 break
@@ -2028,7 +2413,7 @@ class App(BaseTk):
 
     def on_model_selected(self, event=None):
         self.update_model_hint()
-        selected = self.model_var.get().replace(" (fehlt)", "")
+        selected = self.model_var.get().replace(" (fehlt)", "").replace(" (missing)", "")
         if selected in MODEL_SPECS:
             self.cfg["model"] = selected
             cfg_save(self.cfg)
@@ -2036,7 +2421,7 @@ class App(BaseTk):
     def select_recommended_model(self):
         recommended = primary_recommended_model(self.hw)
         for value in self.model_combo["values"]:
-            if value.replace(" (fehlt)", "") == recommended:
+            if value.replace(" (fehlt)", "").replace(" (missing)", "") == recommended:
                 self.model_var.set(value)
                 break
         else:
@@ -2047,36 +2432,36 @@ class App(BaseTk):
         self.update_model_hint()
 
     def update_model_hint(self):
-        name = self.model_var.get().replace(" (fehlt)", "")
+        name = self.model_var.get().replace(" (fehlt)", "").replace(" (missing)", "")
         hint = recommendation_map(self.hw).get(name, "")
-        self.model_hint.config(text=hint)
+        self.model_hint.config(text=self.tr(hint))
 
         if hasattr(self, "footer_model"):
             recommended = primary_recommended_model(self.hw)
             if name == recommended:
-                self.footer_model.config(text=f"★ Empfohlenes Modell: {recommended}")
+                self.footer_model.config(text=self.tr(f"★ Empfohlenes Modell: {recommended}"))
             else:
-                self.footer_model.config(text=f"Empfohlen für diese Hardware: {recommended}")
+                self.footer_model.config(text=self.tr(f"Empfohlen für diese Hardware: {recommended}"))
 
     def update_audio_mode_info(self):
-        mode = self.audio_mode_var.get()
+        mode = canonical_choice(self.audio_mode_var.get())
         mapping = {
             "Automatisch (FLAC)": "Auto: problematische Formate → FLAC (16 kHz, Mono, verlustfrei komprimiert)",
             "WAV verlustfrei": "Alle Dateien → WAV 16 kHz Mono PCM",
             "MP3 kompatibel": "Alle Dateien → MP3 64 kbit/s Mono",
             "Original verwenden": "Keine Vorab-Konvertierung"
         }
-        self.audio_info_label.config(text=mapping.get(mode, ""))
+        self.audio_info_label.config(text=self.tr(mapping.get(mode, "")))
 
 
     def profile_changed(self):
-        p = RESOURCE_PROFILES[self.profile_var.get()]
+        p = RESOURCE_PROFILES[canonical_choice(self.profile_var.get())]
         self.profile_info.config(
             text=f"CPU / ARM: {p['threads']} Threads • nice +{p.get('nice', 0)}"
         )
 
     def choose_output(self):
-        p = filedialog.askdirectory(title="Zielordner auswählen")
+        p = filedialog.askdirectory(title=self.tr("Zielordner auswählen"))
         if p:
             self.custom_output = Path(p)
             self.out_label.config(text=p)
@@ -2084,10 +2469,10 @@ class App(BaseTk):
 
     def add_files_dialog(self):
         files = filedialog.askopenfilenames(
-            title="Audio-/Videodateien auswählen",
+            title=self.tr("Audio-/Videodateien auswählen"),
             filetypes=[
                 ("Audio/Video", "*.mp3 *.wav *.m4a *.flac *.ogg *.opus *.aac *.wma *.mp4 *.mkv *.mov *.webm *.3gp *.amr"),
-                ("Alle Dateien", "*.*")
+                (self.tr("Alle Dateien"), "*.*")
             ]
         )
         self.add_files(files)
@@ -2127,7 +2512,7 @@ class App(BaseTk):
                 continue
             d = self.duration(p)
             self.items.append({"path": p, "duration": d})
-            self.tree.insert("", "end", values=(p.name, fmt_time(d), "Wartend", str(self.output_dir(p))))
+            self.tree.insert("", "end", values=(p.name, fmt_time(d), self.tr("Wartend"), str(self.output_dir(p))))
             have.add(str(p).lower())
 
     def remove_selected(self):
@@ -2146,12 +2531,12 @@ class App(BaseTk):
             self.tree.delete(r)
 
     def selected_model(self):
-        name = self.model_var.get().replace(" (fehlt)", "")
+        name = self.model_var.get().replace(" (fehlt)", "").replace(" (missing)", "")
         spec = MODEL_SPECS.get(name, MODEL_SPECS["Medium"])
         return name, MODEL_DIR / spec["file"]
 
     def preprocess(self, p):
-        mode = self.audio_mode_var.get()
+        mode = canonical_choice(self.audio_mode_var.get())
 
         if mode == "Original verwenden":
             return p, None
@@ -2231,7 +2616,7 @@ class App(BaseTk):
                 self.download_model(model_name, MODEL_SPECS[model_name])
             return
 
-        p = RESOURCE_PROFILES[self.profile_var.get()]
+        p = RESOURCE_PROFILES[canonical_choice(self.profile_var.get())]
         temp_text = f"{temp:.1f} °C" if temp is not None else "nicht verfügbar"
         if not messagebox.askokcancel(
             APP_NAME,
@@ -2240,20 +2625,21 @@ class App(BaseTk):
             f"Hardware: {self.hw.get('gpu', 'Raspberry Pi')}\n"
             f"CPU-Temperatur: {temp_text}\n"
             f"Modell: {model_name}\n"
-            f"Leistungsmodus: {self.profile_var.get()} ({p['threads']} Threads)\n\n"
+            f"Leistungsmodus: {canonical_choice(self.profile_var.get())} ({p['threads']} Threads)\n\n"
             "Der Temperaturschutz pausiert automatisch ab 78 °C."
         ):
             return
 
         self.cfg.update({
             "model": model_name,
-            "language": self.lang_var.get(),
-            "profile": self.profile_var.get(),
+            "language": canonical_choice(self.lang_var.get()),
+            "profile": canonical_choice(self.profile_var.get()),
             "dest_mode": self.dest_var.get(),
             "custom_output": str(self.custom_output) if self.custom_output else "",
-            "audio_mode": self.audio_mode_var.get(),
+            "audio_mode": canonical_choice(self.audio_mode_var.get()),
             "keep_converted": self.keep_converted_var.get(),
             "theme": self.theme_name,
+            "ui_language": self.ui_language,
         })
         cfg_save(self.cfg)
 
@@ -2261,7 +2647,7 @@ class App(BaseTk):
         self.paused = False
         self.thermal_paused = False
         self.thermal_stop_event.clear()
-        self.pause_btn.config(text="⏸ Pause", state="normal")
+        self.pause_btn.config(text=self.tr("⏸ Pause"), state="normal")
         self.start_btn.config(state="disabled")
         self.stop_btn.config(state="normal")
         self.worker = threading.Thread(target=self.run_queue, daemon=True)
@@ -2269,8 +2655,8 @@ class App(BaseTk):
 
     def run_queue(self):
         model_name, model_path = self.selected_model()
-        profile = RESOURCE_PROFILES[self.profile_var.get()]
-        lang = {"Deutsch":"de", "Englisch":"en", "Auto":None}[self.lang_var.get()]
+        profile = RESOURCE_PROFILES[canonical_choice(self.profile_var.get())]
+        lang = {"Deutsch":"de", "Englisch":"en", "Auto":None}[canonical_choice(self.lang_var.get())]
         rows = list(self.tree.get_children())
         total = len(self.items)
 
@@ -2357,7 +2743,7 @@ class App(BaseTk):
                 self.proc = None
                 self.paused = False
                 self.thermal_paused = False
-                self.after(0, lambda: self.pause_btn.config(text="⏸ Pause"))
+                self.after(0, lambda: self.pause_btn.config(text=self.tr("⏸ Pause")))
                 self.ui_row(row, "Fertig" if rc == 0 else f"Fehler ({rc})")
             except Exception as e:
                 self.ui_row(row, "Fehler")
@@ -2394,20 +2780,20 @@ class App(BaseTk):
         self.paused = False
         self.thermal_paused = False
         self.start_btn.config(state="normal")
-        self.pause_btn.config(text="⏸ Pause", state="disabled")
+        self.pause_btn.config(text=self.tr("⏸ Pause"), state="disabled")
         self.stop_btn.config(state="disabled")
-        self.status.config(text="Abgebrochen." if self.cancel else "Stapelverarbeitung abgeschlossen.")
+        self.status.config(text=self.tr("Abgebrochen." if self.cancel else "Stapelverarbeitung abgeschlossen."))
 
     def ui_row(self, row, text):
-        self.after(0, lambda: self.tree.set(row, "status", text))
+        self.after(0, lambda: self.tree.set(row, "status", self.tr(text)))
 
     def ui_status(self, text):
-        self.after(0, lambda: self.status.config(text=text))
+        self.after(0, lambda: self.status.config(text=self.tr(text)))
 
     def ui_progress(self, value, text):
         def f():
             self.progress["value"] = value
-            self.status.config(text=text)
+            self.status.config(text=self.tr(text))
         self.after(0, f)
 
     def log_line(self, text):

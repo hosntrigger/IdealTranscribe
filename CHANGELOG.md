@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+- German and English interface
+- persistent UI language selection
+- translated main window, dialogs, status messages and model manager
+- translated language, performance and audio-preparation display values
+- Windows and Raspberry Pi support retained without changing transcription logic
+
+
 ### Release licensing
 - public v1.0.0 license set to PolyForm Noncommercial 1.0.0; commercial use requires a separate license
 

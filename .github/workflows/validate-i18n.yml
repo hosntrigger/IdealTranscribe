@@ -1,0 +1,22 @@
+name: Validate UI i18n
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile Windows source
+        run: python -m py_compile windows/ideal_transcribe.py
+      - name: Compile Raspberry Pi source
+        run: python -m py_compile linux-raspberrypi/ideal_transcribe.py
+      - name: Validate Raspberry Pi shell scripts
+        run: |
+          bash -n linux-raspberrypi/install.sh
+          bash -n linux-raspberrypi/UNINSTALL_IDEAL_TRANSCRIBE.sh
