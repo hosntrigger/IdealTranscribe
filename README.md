@@ -58,6 +58,7 @@ Ideal Transcribe by **IDEALVISUAL** turns audio and video files into text **on y
 - configurable output folder
 - FLAC / WAV / MP3 / original-audio preparation modes
 - Light / Dark theme
+- German / English interface with persistent language selection
 - Windows CPU/CUDA detection
 - Raspberry Pi ARM/CPU profiles
 - Raspberry Pi temperature protection and batch cooldown
