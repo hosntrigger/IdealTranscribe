@@ -12,6 +12,31 @@ Ideal Transcribe by **IDEALVISUAL** turns audio and video files into text **on y
 
 > **Download:** [Windows](https://github.com/hosntrigger/IdealTranscribe/releases/latest) · [Raspberry Pi](https://github.com/hosntrigger/IdealTranscribe/releases/latest)
 
+## Screenshots
+
+### Windows with NVIDIA CUDA
+
+<p align="center">
+  <img src="docs/images/ideal-transcribe-windows-cuda.png" alt="Ideal Transcribe running on Windows with NVIDIA CUDA acceleration" width="100%">
+</p>
+
+<details>
+<summary><strong>More screenshots — Windows light theme, live transcription and Raspberry Pi</strong></summary>
+
+<br>
+
+| Windows — Light theme | Windows — Live transcription |
+| --- | --- |
+| <img src="docs/images/ideal-transcribe-windows-light.png" alt="Ideal Transcribe light theme on Windows" width="100%"> | <img src="docs/images/ideal-transcribe-windows-live.png" alt="Ideal Transcribe live transcription on Windows" width="100%"> |
+
+### Raspberry Pi
+
+<p align="center">
+  <img src="docs/images/ideal-transcribe-raspberry-pi.png" alt="Ideal Transcribe running locally on Raspberry Pi" width="100%">
+</p>
+
+</details>
+
 ## Why Ideal Transcribe?
 
 - **Local-first privacy** — media stays on your device during transcription.
@@ -28,7 +53,7 @@ Ideal Transcribe by **IDEALVISUAL** turns audio and video files into text **on y
 - drag & drop and file picker
 - batch queue with progress and live output
 - pause / resume / cancel
-- safe-close confirmation during active jobs
+- safe close confirmation during active jobs
 - selectable Whisper models
 - configurable output folder
 - FLAC / WAV / MP3 / original-audio preparation modes
