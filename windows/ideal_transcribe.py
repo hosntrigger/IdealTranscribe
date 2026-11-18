@@ -633,7 +633,8 @@ class DownloadDialog(tk.Toplevel):
         except Exception:
             pass
 
-        self.wait_visibility()
+        if not self.winfo_viewable():
+            self.wait_visibility()
         self.grab_set()
 
     def update_progress(self, label, percent=None, detail=""):
