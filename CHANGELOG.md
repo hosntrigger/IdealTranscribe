@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0 UI Preview
+- Four live themes with persistent selection: Material Dark, Material Light, Studio Dark, Android Expressive.
+- IDEALVISUAL cyan accents and original product and brand marks.
+- Real scalable rounded Tk buttons with hover, focus, pressed and disabled states.
+- Contrasting model and download dialogs, single model manager and two-line model entries.
+- Existing transcription backends, configuration and model storage retained.
+- Native OS dialog decorations remain platform-specific. Preview requires Windows and Raspberry Pi acceptance tests.
+
 ## 1.1.0
 - German and English interface
 - persistent UI language selection

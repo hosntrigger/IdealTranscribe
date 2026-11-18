@@ -3,7 +3,7 @@ setlocal
 cd /d "%~dp0"
 
 echo ====================================================
-echo Ideal Transcribe 1.0.0 - Windows EXE Builder
+echo Ideal Transcribe 1.2.0 - Windows EXE Builder
 echo ====================================================
 echo.
 echo Erstellt lokal eine EXE. Kein Upload, kein Release.

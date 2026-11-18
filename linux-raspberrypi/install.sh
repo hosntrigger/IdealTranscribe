@@ -8,7 +8,7 @@ DESKTOP_DIR="$HOME/.local/share/applications"
 VENV_DIR="$APP_DIR/venv"
 
 echo "===================================================="
-echo " Ideal Transcribe 1.0.0 – Raspberry Pi FINAL"
+echo " Ideal Transcribe 1.2.0 – Raspberry Pi UI PREVIEW"
 echo "===================================================="
 echo
 echo "Bestehendes whisper.cpp und vorhandene Modelle bleiben erhalten."
@@ -27,7 +27,7 @@ rm -f "$DESKTOP_DIR/local-transcriber.desktop"
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR/assets" "$DATA_DIR/models" "$BIN_DIR" "$DESKTOP_DIR"
 
-cp ideal_transcribe.py "$APP_DIR/ideal_transcribe.py"
+cp ideal_transcribe.py ideal_theme.py "$APP_DIR/"
 cp -r assets/* "$APP_DIR/assets/"
 
 # Bestehende whisper.cpp-Modelle ohne Kopieren wiederverwenden.
