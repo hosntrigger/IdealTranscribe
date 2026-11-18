@@ -17,6 +17,7 @@ import webbrowser
 from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+from ideal_theme import THEMES, palette, install_material, dialog_surface, card_surface
 
 try:
     from tkinterdnd2 import TkinterDnD, DND_FILES
@@ -28,7 +29,7 @@ except Exception:
     DND_AVAILABLE = False
 
 APP_NAME = "Ideal Transcribe"
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.2.0"
 SUPPORT_URL = "https://paypal.me/gottschn"
 SCRIPT_DIR = Path(__file__).resolve().parent
 ASSETS_DIR = SCRIPT_DIR / "assets"
@@ -126,6 +127,7 @@ CREATE_NO_WINDOW = 0x08000000 if os.name == "nt" else 0
 CURRENT_UI_LANGUAGE = "de"
 
 UI_TRANSLATIONS = {
+    "Schließen": "Close",
     "♥ Projekt unterstützen": "♥ Support project",
     "Über": "About",
     "🌙 Dunkel": "🌙 Dark",
@@ -600,32 +602,39 @@ def primary_recommended_model(hw):
 
 class DownloadDialog(tk.Toplevel):
     def __init__(self, parent, title):
-        super().__init__(parent)
+        owner = getattr(parent, "_model_window", None)
+        if owner is None or not owner.winfo_exists() or not owner.winfo_viewable():
+            owner = parent
+        super().__init__(owner)
         self.title(translate_ui_text(title))
-        self.transient(parent)
+        self.transient(owner)
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", lambda: None)
 
         box = ttk.Frame(self, padding=16)
         box.pack(fill="both", expand=True)
 
+        ttk.Label(box, text=translate_ui_text(title), style="DialogTitle.TLabel", wraplength=480).pack(anchor="w", pady=(0, 8))
         self.label = ttk.Label(box, text=translate_ui_text("Bitte warten …"), width=62)
         self.label.pack(fill="x")
 
         self.progress = ttk.Progressbar(box, maximum=100, mode="determinate")
         self.progress.pack(fill="x", pady=(10, 6))
 
-        self.detail = ttk.Label(box, text="", foreground="#666")
+        self.detail = ttk.Label(box, text="", style="DialogMuted.TLabel")
         self.detail.pack(fill="x")
 
+        dialog_surface(self, parent.colors)
         self.update_idletasks()
         try:
-            x = parent.winfo_rootx() + (parent.winfo_width() - self.winfo_width()) // 2
-            y = parent.winfo_rooty() + (parent.winfo_height() - self.winfo_height()) // 2
+            x = owner.winfo_rootx() + (owner.winfo_width() - self.winfo_width()) // 2
+            y = owner.winfo_rooty() + (owner.winfo_height() - self.winfo_height()) // 2
             self.geometry(f"+{max(0, x)}+{max(0, y)}")
         except Exception:
             pass
 
+        if not self.winfo_viewable():
+            self.wait_visibility()
         self.grab_set()
 
     def update_progress(self, label, percent=None, detail=""):
@@ -662,7 +671,7 @@ class App(BaseTk):
             self.ui_language = "de"
         set_ui_language(self.ui_language)
         self.theme_name = self.cfg.get("theme", "dark")  # fresh install default: dark
-        if self.theme_name not in ("dark", "light"):
+        if self.theme_name not in THEMES:
             self.theme_name = "dark"
         self.setup_brand_theme()
         self.load_brand_assets()
@@ -720,32 +729,9 @@ class App(BaseTk):
             self.brand_mark_img = None
 
     def setup_brand_theme(self):
-        if getattr(self, "theme_name", "dark") == "light":
-            self.colors = {
-                "bg": "#f4f7fa",
-                "panel": "#ffffff",
-                "panel_2": "#e8eef4",
-                "line": "#c8d3de",
-                "text": "#182330",
-                "muted": "#64778a",
-                "accent": "#00aeef",
-                "accent_2": "#007db2",
-            }
-            disabled = "#98a5b2"
-            accent_text = "#ffffff"
-        else:
-            self.colors = {
-                "bg": "#121821",
-                "panel": "#1a2230",
-                "panel_2": "#202b3c",
-                "line": "#2c3a4d",
-                "text": "#edf2f7",
-                "muted": "#8fa3b8",
-                "accent": "#00aeef",
-                "accent_2": "#48d4ff",
-            }
-            disabled = "#66788b"
-            accent_text = "#0d141d"
+        self.colors = palette(self.theme_name)
+        disabled = self.colors["disabled"]
+        accent_text = self.colors["accent_text"]
 
         try:
             self.configure(bg=self.colors["bg"])
@@ -769,7 +755,7 @@ class App(BaseTk):
 
         style.configure(
             "TLabelframe",
-            background=self.colors["bg"],
+            background=self.colors["panel"],
             bordercolor=self.colors["line"],
             relief="solid",
         )
@@ -868,6 +854,10 @@ class App(BaseTk):
         )
         style.configure("TSeparator", background=self.colors["line"])
 
+        install_material(self, style, self.colors)
+        style.configure("Card.TRadiobutton", background=self.colors["panel"])
+        style.configure("Card.TCheckbutton", background=self.colors["panel"])
+
         # Native text area needs direct recoloring.
         if hasattr(self, "log"):
             try:
@@ -883,17 +873,18 @@ class App(BaseTk):
             except Exception:
                 pass
 
-    def toggle_theme(self):
-        self.theme_name = "light" if self.theme_name == "dark" else "dark"
-        current = cfg_load()
-        current["theme"] = self.theme_name
-        cfg_save(current)
+    def change_theme(self, event=None):
+        selected = self.theme_var.get()
+        self.theme_name = next((k for k, v in THEMES.items() if v[0] == selected), "dark")
+        self.cfg["theme"] = self.theme_name
+        cfg_save(self.cfg)
         self.setup_brand_theme()
-        if hasattr(self, "theme_btn"):
-            source = "🌙 Dunkel" if self.theme_name == "light" else "☀ Hell"
-            self.theme_btn._i18n_source_text = source
-            self.theme_btn.configure(text=self.tr(source))
-
+        def recolor_dialogs(widget):
+            for child in widget.winfo_children():
+                if isinstance(child, tk.Toplevel):
+                    dialog_surface(child, self.colors)
+                recolor_dialogs(child)
+        recolor_dialogs(self)
 
     def tr(self, text):
         return translate_ui_text(text, self.ui_language)
@@ -1002,6 +993,9 @@ class App(BaseTk):
         left_hdr = ttk.Frame(hdr)
         left_hdr.pack(side="left", fill="x", expand=True)
 
+        if getattr(self, "app_icon_img", None):
+            self.header_product_icon = self.app_icon_img.subsample(8, 8)
+            ttk.Label(left_hdr, image=self.header_product_icon, style="HeaderIcon.TLabel").pack(side="left", padx=(0, 8))
         if getattr(self, "brand_mark_img", None):
             ttk.Label(left_hdr, image=self.brand_mark_img, style="HeaderIcon.TLabel").pack(side="left", padx=(2, 10), pady=(2, 2))
 
@@ -1011,11 +1005,11 @@ class App(BaseTk):
         ttk.Label(text_hdr, text="by IDEALVISUAL", style="BrandTag.TLabel").pack(anchor="w", pady=(1, 0))
 
         self.hw_label = ttk.Label(
-            hdr,
+            main,
             text=f"{self.hw['gpu']} • {self.hw['backend']}",
             style="Muted.TLabel"
         )
-        self.hw_label.pack(side="right")
+        # Hardware status is packed below the header.
 
         ttk.Button(
             hdr,
@@ -1028,13 +1022,13 @@ class App(BaseTk):
             command=self.show_about
         ).pack(side="right", padx=(0, 6))
 
-        self.theme_btn = ttk.Button(
-            hdr,
-            text=self.tr("🌙 Dunkel" if self.theme_name == "light" else "☀ Hell"),
-            command=self.toggle_theme
+        self.theme_var = tk.StringVar(value=THEMES[self.theme_name][0])
+        self.theme_combo = ttk.Combobox(
+            hdr, textvariable=self.theme_var, values=[v[0] for v in THEMES.values()],
+            state="readonly", width=17
         )
-        self.theme_btn._i18n_source_text = "🌙 Dunkel" if self.theme_name == "light" else "☀ Hell"
-        self.theme_btn.pack(side="right", padx=(0, 6))
+        self.theme_combo.pack(side="right", padx=(0, 6))
+        self.theme_combo.bind("<<ComboboxSelected>>", self.change_theme)
 
         self.ui_lang_var = tk.StringVar(value="English" if self.ui_language == "en" else "Deutsch")
         self.ui_lang_combo = ttk.Combobox(
@@ -1047,6 +1041,7 @@ class App(BaseTk):
         self.ui_lang_combo.pack(side="right", padx=(0, 6))
         self.ui_lang_combo.bind("<<ComboboxSelected>>", self.change_ui_language)
 
+        self.hw_label.pack(fill="x", pady=(2, 0))
         ttk.Label(
             main,
             text="Lokale Stapeltranskription • Drag & Drop • whisper.cpp • automatische Audioaufbereitung",
@@ -1154,6 +1149,8 @@ class App(BaseTk):
         ).pack(side="left", padx=(0, 8))
         ttk.Button(row, text="Modell verwalten…", command=self.model_manager).pack(side="left", padx=(0, 12))
 
+        row = ttk.Frame(main)
+        row.pack(fill="x", pady=(0, 8))
         ttk.Label(row, text="Sprache:").pack(side="left")
         self.lang_var = tk.StringVar(
             value=display_choice(self.cfg.get("language", "Deutsch"), self.ui_language)
@@ -1186,9 +1183,9 @@ class App(BaseTk):
         orow = ttk.Frame(ob, padding=8)
         orow.pack(fill="x")
         self.dest_var = tk.StringVar(value=self.cfg.get("dest_mode", "subfolder"))
-        ttk.Radiobutton(orow, text="Gleicher Ordner", variable=self.dest_var, value="same").pack(side="left")
-        ttk.Radiobutton(orow, text="Unterordner „transkripte“", variable=self.dest_var, value="subfolder").pack(side="left", padx=8)
-        ttk.Radiobutton(orow, text="Benutzerdefiniert", variable=self.dest_var, value="custom").pack(side="left")
+        ttk.Radiobutton(orow, style="Card.TRadiobutton", text="Gleicher Ordner", variable=self.dest_var, value="same").pack(side="left")
+        ttk.Radiobutton(orow, style="Card.TRadiobutton", text="Unterordner „transkripte“", variable=self.dest_var, value="subfolder").pack(side="left", padx=8)
+        ttk.Radiobutton(orow, style="Card.TRadiobutton", text="Benutzerdefiniert", variable=self.dest_var, value="custom").pack(side="left")
         ttk.Button(orow, text="Ordner wählen…", command=self.choose_output).pack(side="left", padx=(12, 6))
         self.out_label = ttk.Label(orow, text=str(self.custom_output) if self.custom_output else "Noch kein Zielordner gewählt")
         self.out_label.pack(side="left", fill="x", expand=True)
@@ -1233,6 +1230,7 @@ class App(BaseTk):
         )
         ttk.Checkbutton(
             ar,
+            style="Card.TCheckbutton",
             text="Konvertierte Audiodatei behalten",
             variable=self.keep_converted_var
         ).pack(side="left")
@@ -1247,6 +1245,9 @@ class App(BaseTk):
             "<<ComboboxSelected>>",
             lambda e: self.update_audio_mode_info()
         )
+
+        for panel in (sr, fi, orow, ar):
+            card_surface(panel)
 
         # Flexible queue / live-output split.
         # The divider can be dragged vertically so the live log remains visible
@@ -1937,15 +1938,27 @@ class App(BaseTk):
         threading.Thread(target=worker, daemon=True).start()
 
     def model_manager(self):
+        existing = getattr(self, "_model_window", None)
+        if existing is not None and existing.winfo_exists():
+            existing.deiconify()
+            existing.lift()
+            existing.focus_set()
+            return
         win = tk.Toplevel(self)
-        win.title("Modelle verwalten")
-        win.geometry("900x590")
+        self._model_window = win
+        win.title(self.tr("Modelle verwalten"))
+        win.geometry(f"{min(940, win.winfo_screenwidth()-60)}x{min(650, win.winfo_screenheight()-100)}")
         win.transient(self)
+        win.bind("<Escape>", lambda e: win.destroy())
 
         frm = ttk.Frame(win, padding=14)
         frm.pack(fill="both", expand=True)
 
-        ttk.Label(frm, text="Whisper-Modelle", font=("Segoe UI", 14, "bold")).pack(anchor="w")
+        header = ttk.Frame(frm, style="Dialog.TFrame")
+        header.pack(fill="x", pady=(0, 8))
+        ttk.Label(header, text="Whisper-Modelle", style="DialogTitle.TLabel").pack(side="left")
+        ttk.Button(header, text="Schließen", command=win.destroy).pack(side="right")
+        ttk.Separator(frm).pack(fill="x", pady=(0, 8))
         ttk.Label(
             frm,
             text=f"Hardware: {self.hw['gpu']} • Empfehlungen werden automatisch angepasst."
@@ -2016,8 +2029,12 @@ class App(BaseTk):
             rec = recommendation_map(self.hw)
 
             for name, spec in MODEL_SPECS.items():
-                row = ttk.Frame(list_frame)
-                row.pack(fill="x", pady=5)
+                row_panel = ttk.Frame(list_frame, padding=(8, 5), style="Dialog.TFrame")
+                row_panel.pack(fill="x", pady=3)
+                row = ttk.Frame(row_panel)
+                row.pack(fill="x")
+                actions = ttk.Frame(row_panel)
+                actions.pack(fill="x", pady=(4, 0))
 
                 target = MODEL_DIR / spec["file"]
                 size_text = (
@@ -2026,24 +2043,24 @@ class App(BaseTk):
                     else f"{spec['size_mb']} MB"
                 )
 
-                ttk.Label(row, text=name, width=24).pack(side="left")
+                ttk.Label(row, text=name, font=("TkDefaultFont", 10, "bold"), width=24).pack(side="left")
                 ttk.Label(row, text=size_text, width=10).pack(side="left")
                 ttk.Label(row, text=spec.get("kind", ""), width=12).pack(side="left")
 
                 recommendation = rec.get(name, "")
-                ttk.Label(row, text=recommendation, width=18).pack(side="left")
+                ttk.Label(row, text=recommendation, width=14).pack(side="left")
 
                 if target.exists():
                     size_mb = target.stat().st_size / 1024 / 1024
                     status = ttk.Label(
                         row,
                         text=f"✓ installiert ({size_mb:.0f} MB)",
-                        width=28
+                        width=22
                     )
                     status.pack(side="left")
 
                     ttk.Button(
-                        row,
+                        actions,
                         text="Deinstallieren",
                         command=lambda n=name, s=spec: self.uninstall_model_live(
                             n, s, None, rebuild
@@ -2051,14 +2068,14 @@ class App(BaseTk):
                     ).pack(side="right", padx=(6, 0))
 
                     ttk.Button(
-                        row,
+                        actions,
                         text="Aktualisieren",
                         command=lambda n=name, s=spec: self.update_model_live(
                             n, s, None, rebuild
                         )
                     ).pack(side="right", padx=(6, 0))
 
-                    check_btn = ttk.Button(row, text="Update prüfen")
+                    check_btn = ttk.Button(actions, text="Update prüfen")
                     check_btn.config(
                         command=lambda n=name, s=spec, st=status, b=check_btn:
                             self.check_model_update(n, s, st, b)
@@ -2066,14 +2083,16 @@ class App(BaseTk):
                     check_btn.pack(side="right")
                     rows_for_update.append((name, spec, status, check_btn))
                 else:
-                    ttk.Label(row, text="nicht installiert", width=28).pack(side="left")
+                    ttk.Label(row, text="nicht installiert", width=22).pack(side="left")
                     ttk.Button(
-                        row,
+                        actions,
                         text="Herunterladen",
                         command=lambda n=name, s=spec: self.download_model_live(
                             n, s, rebuild
                         )
                     ).pack(side="right")
+
+                ttk.Separator(row_panel).pack(fill="x", pady=(6, 0))
 
             ttk.Separator(list_frame).pack(fill="x", pady=12)
 
@@ -2088,7 +2107,10 @@ class App(BaseTk):
                     command=check_all
                 ).pack(anchor="e")
 
+            dialog_surface(win, self.colors)
+
         rebuild()
+        win.lift()
 
     def install_model_group(self, names, group_title, rebuild):
         missing = [n for n in names if not (MODEL_DIR / MODEL_SPECS[n]["file"]).exists()]
